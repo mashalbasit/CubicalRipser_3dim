@@ -31,7 +31,8 @@ DenseCubicalGrids::DenseCubicalGrids(Config& _config)  {
 
 
 // read from file
-void DenseCubicalGrids::loadImage(bool embedded){
+void DenseCubicalGrids::loadImage(bool _embedded){
+	embedded = _embedded;
 	// read file
 	cout << "Reading " << config->filename << endl;
 	switch(config->format){
@@ -62,76 +63,20 @@ void DenseCubicalGrids::loadImage(bool embedded){
 			}else {
 				az = 1;
 			}
-			dense3 = alloc3d(ax+2, ay+2, az+2);
 			cout << "ax : ay : az = " << ax << " : " << ay << " : " << az << endl;
+            data.resize(ax*ay*az);
 
 			double dou;
-			if(embedded){ // dual complex
-				if(az>1){
-					dense3 = alloc3d(ax+4, ay+4, az+4);
-					for (uint32_t z = 0; z < az + 4; ++z) {
-						for (uint32_t y = 0; y < ay + 4; ++y) {
-							for (uint32_t x = 0; x < ax + 4; ++x) {
-								if (1 < x && x <= ax+1 && 1 < y && y <= ay+1 && 1 < z && z <= az+1) {
-									if (!fin.eof()) {
-										fin.read((char *)&dou, sizeof(double));
-										dense3[x][y][z] = -dou;
-									}
-									else {
-										cerr << "file endof error " << endl;
-									}
-								}else if (0 == x || x == ax+3 || 0 == y || y == ay+3 || 0 == z || z == az+3) {
-									dense3[x][y][z] = config->threshold;
-								}else{
-									dense3[x][y][z] = -config->threshold;
-								}
-			//					cout << x << "," << y << "," << z << ": " << dense3[x][y][z] << endl;
-							}
-						}
-					}
-					az = az + 2;
-				}else{
-					dense3 = alloc3d(ax+4, ay+4, az+2);
-					for (uint32_t z = 0; z < az + 2; ++z) { // z-axis remains the same
-						for (uint32_t y = 0; y < ay + 4; ++y) {
-							for (uint32_t x = 0; x < ax + 4; ++x) {
-								if (1 < x && x <= ax+1 && 1 < y && y <= ay+1 && 1<=z && z<= az) {
-									if (!fin.eof()) {
-										fin.read((char *)&dou, sizeof(double));
-										dense3[x][y][z] = -dou;
-									}
-									else {
-										cerr << "file endof error " << endl;
-									}
-								}else if (0 == x || x == ax+3 || 0 == y || y == ay+3 || z==0 || z==az+1) {
-									dense3[x][y][z] = config->threshold;
-								}else{
-									dense3[x][y][z] = -config->threshold;
-								}
-								cout << x << "," << y << "," << z << ": " << dense3[x][y][z] << endl;
-							}
-						}
-					}
-				}
-				ax = ax + 2;
-				ay = ay + 2;				
-			}else{
-				for (uint32_t z = 0; z < az + 2; ++z) {
-					for (uint32_t y = 0; y < ay + 2; ++y) {
-						for (uint32_t x = 0; x < ax + 2; ++x) {
-							if (0 < x && x <= ax && 0 < y && y <= ay && 0 < z && z <= az) {
-								if (!fin.eof()) {
-									fin.read((char *)&dou, sizeof(double));
-									dense3[x][y][z] = dou;
-								}
-								else {
-									cerr << "file endof error " << endl;
-								}
-							}
-							else {
-								dense3[x][y][z] = config->threshold;
-							}
-						}
+			for (uint32_t z = 0; z < az; ++z) {
+				for (uint32_t y = 0; y < ay; ++y) {
+					for (uint32_t x = 0; x < ax; ++x) {
+                        if (!fin.eof()) {
+                            fin.read((char *)&dou, sizeof(double));
+                            setBirth(x,y,z,dou);
+                        }
+                        else {
+                            cerr << "file endof error " << endl;
+                        }
 					}
 				}
 			}
@@ -162,84 +107,22 @@ void DenseCubicalGrids::loadImage(bool embedded){
 			}else {
 				az = 1;
 			}
-			dense3 = alloc3d(ax+2, ay+2, az+2);
 			cout << "ax : ay : az = " << ax << " : " << ay << " : " << az << endl;
-			if(embedded){ // dual complex
-				if(az>1){
-					dense3 = alloc3d(ax+4, ay+4, az+4);
-					for (uint32_t z = 0; z < az + 4; ++z) {
-						for (uint32_t y = 0; y < ay + 4; ++y) {
-							for (uint32_t x = 0; x < ax + 4; ++x) {
-								if (1 < x && x <= ax+1 && 1 < y && y <= ay+1 && 1 < z && z <= az+1) {
-									if (!reading_file.eof()) {
-										getline(reading_file, reading_line_buffer);
-										double dou = atof(reading_line_buffer.c_str());
-										if (dou == -1) {
-											dense3[x][y][z] = config->threshold;
-										}
-										else {
-											dense3[x][y][z] = -dou;
-										}
-									}
-								}else if (0 == x || x == ax+3 || 0 == y || y == ay+3 || 0 == z || z == az+3) {
-									dense3[x][y][z] = config->threshold;
-								}else{
-									dense3[x][y][z] = -config->threshold;
-								}
-			//					cout << x << "," << y << "," << z << ": " << dense3[x][y][z] << endl;
-							}
-						}
-					}
-					az = az + 2;
-				}else{
-					dense3 = alloc3d(ax+4, ay+4, az+2);
-					for (uint32_t z = 0; z < az + 2; ++z) { // z-axis remains the same
-						for (uint32_t y = 0; y < ay + 4; ++y) {
-							for (uint32_t x = 0; x < ax + 4; ++x) {
-								if (1 < x && x <= ax+1 && 1 < y && y <= ay+1 && 1<=z && z<= az) {
-									if (!reading_file.eof()) {
-										getline(reading_file, reading_line_buffer);
-										double dou = atof(reading_line_buffer.c_str());
-										if (dou == -1) {
-											dense3[x][y][z] = config->threshold;
-										}
-										else {
-											dense3[x][y][z] = -dou;
-										}
-									}
-								}else if (0 == x || x == ax+3 || 0 == y || y == ay+3 || z==0 || z==az+1) {
-									dense3[x][y][z] = config->threshold;
-								}else{
-									dense3[x][y][z] = -config->threshold;
-								}
-								cout << x << "," << y << "," << z << ": " << dense3[x][y][z] << endl;
-							}
-						}
-					}
-				}
-				ax = ax + 2;
-				ay = ay + 2;				
-			}else{
-				for (uint32_t z = 0; z < az + 2; ++z) {
-					for (uint32_t y = 0; y < ay + 2; ++y) {
-						for (uint32_t x = 0; x < ax + 2; ++x) {
-							if (0 < x && x <= ax && 0 < y && y <= ay && 0 < z && z <= az) {
-								if (!reading_file.eof()) {
-									getline(reading_file, reading_line_buffer);
-									double dou = atof(reading_line_buffer.c_str());
-									if (dou == -1) {
-										dense3[x][y][z] = config->threshold;
-									}
-									else {
-										dense3[x][y][z] = dou;
-									}
-								}
+            data.resize(ax*ay*az);
+			for (uint32_t z = 0; z < az; ++z) {
+				for (uint32_t y = 0; y < ay; ++y) {
+					for (uint32_t x = 0; x < ax; ++x) {
+						if (!reading_file.eof()) {
+							getline(reading_file, reading_line_buffer);
+							double dou = atof(reading_line_buffer.c_str());
+							if (dou == -1) {
+								setBirth(x,y,z,config->threshold);
 							}
 							else {
-								dense3[x][y][z] = config->threshold;
+								setBirth(x,y,z,dou);
 							}
-						} 
-					}
+						}
+					} 
 				}
 			}
 			reading_file.close();
@@ -248,7 +131,6 @@ void DenseCubicalGrids::loadImage(bool embedded){
 		case NUMPY:
 		{
 			vector<unsigned long> shape;
-			vector<double> data;
 			npy::LoadArrayFromNumpy(config->filename.c_str(), shape, data);
 			if(shape.size() > 3){
 				cerr << "Input array should be 2 or 3 dimensional " << endl;
@@ -267,63 +149,16 @@ void DenseCubicalGrids::loadImage(bool embedded){
 				az = 1;
 			}
 			cout << "ax : ay : az = " << ax << " : " << ay << " : " << az << endl;
-			uint64_t i = 0;
-			// note the order of axis
-			if(embedded){ // dual complex
-				if(az>1){
-					dense3 = alloc3d(ax+4, ay+4, az+4);
-					for (uint32_t x = 0; x < ax + 4; ++x) {
-						for (uint32_t y = 0; y < ay + 4; ++y) {
-							for (uint32_t z = 0; z < az + 4; ++z) {
-								if (1 < x && x <= ax+1 && 1 < y && y <= ay+1 && 1 < z && z <= az+1) {
-									dense3[x][y][z] = -data[i++];
-								}else if (0 == x || x == ax+3 || 0 == y || y == ay+3 || 0 == z || z == az+3) {
-									dense3[x][y][z] = config->threshold;
-								}else{
-									dense3[x][y][z] = -config->threshold;
-								}
-			//					cout << x << "," << y << "," << z << ": " << dense3[x][y][z] << endl;
-							}
-						}
-					}
-					az = az + 2;
-				}else{
-					dense3 = alloc3d(ax+4, ay+4, az+2);
-					for (uint32_t x = 0; x < ax + 4; ++x) {
-						for (uint32_t y = 0; y < ay + 4; ++y) {
-							for (uint32_t z = 0; z < az + 2; ++z) { // z-axis remains the same
-								if (1 < x && x <= ax+1 && 1 < y && y <= ay+1 && 1<=z && z<= az) {
-									dense3[x][y][z] = -data[i++];
-								}else if (0 == x || x == ax+3 || 0 == y || y == ay+3 || z==0 || z==az+1) {
-									dense3[x][y][z] = config->threshold;
-								}else{
-									dense3[x][y][z] = -config->threshold;
-								}
-//								cout << x << "," << y << "," << z << ": " << dense3[x][y][z] << endl;
-							}
-						}
-					}
-				}
-				ax = ax + 2;
-				ay = ay + 2;				
-			}else{
-				dense3 = alloc3d(ax + 2, ay + 2, az + 2);
-				for (uint32_t x = 0; x < ax + 2; ++x) {
-					for (uint32_t y = 0; y <ay + 2; ++y) {
-						for (uint32_t z = 0; z < az + 2; ++z) {
-							if (0 < x && x <= ax && 0 < y && y <= ay && 0 < z && z <= az) {
-								dense3[x][y][z] = data[i++];
-							}
-							else { // fill the boundary with the threashold value
-								dense3[x][y][z] = config->threshold;
-							}
-						}
-					}
-				}
-				break;
-			}
+			break;
 		}
 	}	
+    if(embedded){ // dual complex
+        if(az>1){
+            az = az + 2;
+        }
+        ax = ax + 2;
+        ay = ay + 2;
+    }
 	axy = ax * ay;
 	ayz = ay * az;
 	axyz = ax * ay * az;
@@ -331,58 +166,59 @@ void DenseCubicalGrids::loadImage(bool embedded){
 }
 
 // return filtlation value for a cube
-double DenseCubicalGrids::getBirth(uint32_t cx, uint32_t cy, uint32_t cz, uint8_t cm, uint8_t dim) {
+
+double DenseCubicalGrids::getBirth(int32_t x, int32_t y, int32_t z, uint8_t cm, uint8_t dim) {
 	// beware of the shift due to the boundary
 	switch (dim) {
 		case 0:
-			return dense3[cx+1][cy+1][cz+1];
+            return(getBirth(x,y,z));
 		case 1:
 			switch (cm) {
 			case 0:
-				return max(dense3[cx+1][cy+1][cz+1], dense3[cx + 2][cy + 1][cz + 1]);
+				return max(getBirth(x,y,z), getBirth(x+1,y  ,z));
 			case 1:
-				return max(dense3[cx+1][cy+1][cz+1], dense3[cx + 1][cy + 2][cz + 1]);
+				return max(getBirth(x,y,z), getBirth(x  ,y+1,z));
 			case 2:
-				return max(dense3[cx+1][cy+1][cz+1], dense3[cx + 1][cy + 1][cz + 2]);
+				return max(getBirth(x,y,z), getBirth(x  ,y  ,z+1));
 			case 3:
-				return max(dense3[cx+1][cy+1][cz+1], dense3[cx + 2][cy + 2][cz + 1]);
+				return max(getBirth(x,y,z), getBirth(x+1,y+1,z));
 			case 4:
-				return max(dense3[cx+1][cy+1][cz+1], dense3[cx + 2][cy + 0][cz + 1]);
+				return max(getBirth(x,y,z), getBirth(x+1,y-1,z));
 			// for 3d dual only
 			case 5:
-				return max(dense3[cx+1][cy+1][cz+1], dense3[cx + 1][cy + 0][cz + 2]);
+				return max(getBirth(x,y,z), getBirth(x  ,y-1,z+1));
 			case 6:
-				return max(dense3[cx+1][cy+1][cz+1], dense3[cx + 1][cy + 2][cz + 2]);
+				return max(getBirth(x,y,z), getBirth(x  ,y+1,z+1));
 			case 7:
-				return max(dense3[cx+1][cy+1][cz+1], dense3[cx + 2][cy + 0][cz + 2]);
+				return max(getBirth(x,y,z), getBirth(x+1,y-1,z+1));
 			case 8:
-				return max(dense3[cx+1][cy+1][cz+1], dense3[cx + 2][cy + 1][cz + 2]);
+				return max(getBirth(x,y,z), getBirth(x+1,y  ,z+1));
 			case 9:
-				return max(dense3[cx+1][cy+1][cz+1], dense3[cx + 2][cy + 2][cz + 2]);
+				return max(getBirth(x,y,z), getBirth(x+1,y+1,z+1));
 			case 10:
-				return max(dense3[cx+1][cy+1][cz+1], dense3[cx + 2][cy + 0][cz + 0]);
+				return max(getBirth(x,y,z), getBirth(x+1,y-1,z-1));
 			case 11:
-				return max(dense3[cx+1][cy+1][cz+1], dense3[cx + 2][cy + 1][cz + 0]);
+				return max(getBirth(x,y,z), getBirth(x+1,y  ,z-1));
 			case 12:
-				return max(dense3[cx+1][cy+1][cz+1], dense3[cx + 2][cy + 2][cz + 0]);
+				return max(getBirth(x,y,z), getBirth(x+1,y+1,z-1));
 			}
 		case 2:
 			switch (cm) {
 			case 0: // x - y (fix z)
-				return max({ dense3[cx+1][cy+1][cz+1], dense3[cx+2][cy+1][cz+1],
-					dense3[cx+2][cy+2][cz+1], dense3[cx+1][cy+2][cz+1] });
+				return max({ getBirth(x,y,z), getBirth(x+1,y,z),
+					getBirth(x+1,y+1,z), getBirth(x,y+1,z) });
 			case 1: // z - x (fix y)
-				return max({ dense3[cx+1][cy+1][cz+1], dense3[cx+1][cy+1][cz+2],
-					dense3[cx+2][cy+1][cz+2], dense3[cx+2][cy+1][cz+1] });
+				return max({ getBirth(x,y,z), getBirth(x,y,z+1),
+					getBirth(x+1,y,z+1), getBirth(x+1,y,z) });
 			case 2: // y - z (fix x)
-				return max({ dense3[cx+1][cy+1][cz+1], dense3[cx+1][cy+2][cz+1],
-					dense3[cx+1][cy+2][cz+2], dense3[cx+1][cy+1][cz+2] });
+				return max({ getBirth(x,y,z), getBirth(x,y+1,z),
+					getBirth(x,y+1,z+1), getBirth(x,y,z+1) });
 			}
 		case 3:
-			return max({ dense3[cx+1][cy+1][cz+1], dense3[cx+2][cy+1][cz+1],
-				dense3[cx+2][cy+2][cz+1], dense3[cx+1][cy+2][cz+1],
-				dense3[cx+1][cy+1][cz+2], dense3[cx+2][cy+1][cz+2],
-				dense3[cx+2][cy+2][cz+2], dense3[cx+1][cy+2][cz+2] });
+			return max({ getBirth(x,y,z), getBirth(x+1,y,z),
+				getBirth(x+1,y+1,z), getBirth(x,y+1,z),
+				getBirth(x,y,z+1), getBirth(x+1,y,z+1),
+				getBirth(x+1,y+1,z+1), getBirth(x,y+1,z+1) });
 		}
 	return threshold; // dim > 3
 }
@@ -403,7 +239,7 @@ double ***DenseCubicalGrids::alloc3d(uint32_t x, uint32_t y, uint32_t z) {
 }
 
 DenseCubicalGrids::~DenseCubicalGrids(){
-	free(dense3[0][0]);
-	free(dense3[0]);
-	free(dense3);
+//	free(dense3[0][0]);
+//	free(dense3[0]);
+//	free(dense3);
 }

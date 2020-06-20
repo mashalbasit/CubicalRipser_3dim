@@ -65,6 +65,9 @@ void JointPairs::joint_pairs_main(vector<Cube>& ctr, int current_dim){
 		// for each edge e, identify root indices u and v of the end points
 		uint64_t uind = e->x() + (dcg->ax)*e->y() + (dcg->axy)*e->z();
 		uint64_t vind;
+//        uint32_t x=e->x(), y=e->y(), z=e->z(), m=e->m();
+//        cout << x << y << z << m << ": " << dcg -> getBirth(x,y,z,m, 1) << endl;
+
 		u = dset.find(uind);
 		switch(e->m()){ //type
 			case 0:

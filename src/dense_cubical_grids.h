@@ -26,11 +26,33 @@ public:
 	uint8_t dim;
 	uint32_t ax, ay, az;
     uint32_t axy, axyz, ayz;
-	double*** dense3;
+	bool embedded; // alexander dual (sphere embedding)
+    vector<double> data;
+//	double*** dense3;
 
 	DenseCubicalGrids(Config&);
 	~DenseCubicalGrids();
 	void loadImage(bool embedded);
 	double ***alloc3d(uint32_t x, uint32_t y, uint32_t z);
-	double getBirth(uint32_t x, uint32_t y, uint32_t z, uint8_t cm, uint8_t dim);
+	double getBirth(int32_t x, int32_t y, int32_t z, uint8_t cm, uint8_t dim);
+    inline double getBirth(int32_t x, int32_t y, int32_t z) {
+        if(embedded){
+            if (1 <= x && x < ax-1 &&  1 <= y && y < ay-1 && 1 <= z && z < az-1) {
+                return -data[(z-1) + (y-1)*(az-2) + (x-1)*(ay-2)*(az-2)];
+            }else if(-1 == x || x == ax || -1 == y || y == ay || z==-1 || z==az) {
+                return(threshold);
+            }else{
+                return(-threshold);
+            }
+        }else{
+            if (0 <= x && x < ax &&  0 <= y && y < ay && 0 <= z && z < az) {
+                return data[z+y*az+x*ayz];
+            }else{
+                return(threshold);
+            }
+        }
+    }
+    inline void setBirth(int32_t x, int32_t y, int32_t z, double val){
+        data[z+y*az+x*ay*az] = val;
+    }
 };

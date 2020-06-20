@@ -39,7 +39,7 @@ UnionFind::UnionFind(DenseCubicalGrids* _dcg) {
 		for (uint32_t y = 0; y < _dcg->ay; ++y) {
 			for(uint32_t x = 0; x < _dcg->ax ; ++x){
 				parent[i] = i;
-				birthtime[i] = _dcg->getBirth(x,y,z,0,0);
+				birthtime[i] = _dcg->getBirth(x,y,z);
 				time_max[i] = birthtime[i];
 //				cout << x << "," << y << "," << z << ": " << birthtime[i] << endl;
 				i++;
@@ -50,7 +50,7 @@ UnionFind::UnionFind(DenseCubicalGrids* _dcg) {
 
 // find the root of a node x (specified by the index)
 uint64_t UnionFind::find(uint64_t x){
-	uint64_t y = x, z = parent[y];
+	uint64_t y = x, z = parent[x];
 	while (z != y) {
 		y = z;
 		z = parent[y];
