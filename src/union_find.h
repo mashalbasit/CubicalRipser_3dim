@@ -50,7 +50,7 @@ UnionFind::UnionFind(DenseCubicalGrids* _dcg) {
 
 // find the root of a node x (specified by the index)
 uint64_t UnionFind::find(uint64_t x){
-	uint64_t y = x, z = parent[x];
+	uint64_t y = x, z = parent[y];
 	while (z != y) {
 		y = z;
 		z = parent[y];
