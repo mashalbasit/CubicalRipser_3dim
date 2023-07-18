@@ -37,7 +37,6 @@ namespace py = pybind11;
 py::array_t<double> computePH(py::array_t<double> img, int maxdim=0, bool top_dim=false, bool embedded=false, const std::string &location="yes"){
 	// we ignore "location" argument
 	Config config;
-	config.threshold = std::make_pair(20.0, 100.0);
 	config.format = NUMPY;
 
 	vector<WritePairs> writepairs; // (dim birth death x y z)
