@@ -91,7 +91,7 @@ py::array_t<double> computePH(py::array_t<double> img, int maxdim=0, bool top_di
 	if(config.method==ALEXANDER){
 		// compute PH
 		Config config;
-                config.threshold = std::make_pair(20.0, 60.0);
+                config.threshold >= 100;
 		JointPairs* jp = new JointPairs(dcg, writepairs, config);
 		if(dcg->dim==1){
 			jp -> enum_edges({0},ctr);
