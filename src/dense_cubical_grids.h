@@ -28,7 +28,8 @@ using namespace std;
 class DenseCubicalGrids{
 public:
 	Config *config;
-	double threshold;
+	double minThreshold = 20;
+        double maxThreshold = 60;;
 	uint8_t dim;
 	uint32_t img_x, img_y, img_z;
 	uint32_t ax, ay, az;
