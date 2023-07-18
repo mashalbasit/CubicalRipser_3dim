@@ -15,7 +15,7 @@ struct Config {
 	file_format format;
 //    calculation_method method = ALEXANDER;
 	calculation_method method = LINKFIND;
-        std::pair<double, double> threshold = std::make_pair(20.0, 100.0);
+        double threshold = 256;
 	int maxdim=2;;  // compute PH for these dimensions
 	bool print = false; // flag for printing parsistence pairs to stdout
 	bool verbose = false;
