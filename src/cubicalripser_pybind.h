@@ -52,7 +52,6 @@ py::array_t<double> computePH(py::array_t<double> img, int maxdim=0, bool top_di
 	config.maxdim = std::min<uint8_t>(config.maxdim, dcg->dim - 1);
 	if(top_dim && dcg->dim > 1){
 		config.method = ALEXANDER;
-	        config.threshold = std::make_pair(20.0, 60.0)
 		config.embedded = !embedded;
 	}else{
 		config.embedded = embedded;
