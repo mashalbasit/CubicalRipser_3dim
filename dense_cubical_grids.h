@@ -36,16 +36,26 @@ using namespace std;
 
 enum file_format { DIPHA, PERSEUS };
 
+
 class DenseCubicalGrids { // file_read
 public:
-	double threshold;
+        const double MIN_THRESHOLD = 20.0;
+        const double MAX_THRESHOLD = 100.0;
+	
 	int dim;
 	int ax, ay, az;
 	double dense3[512][512][512];
 	file_format format;
 
 	DenseCubicalGrids(const std::string& filename, double _threshold, file_format _format);
-
+        if (_threshold < MIN_THRESHOLD) {
+        threshold = MIN_THRESHOLD;
+        } else if (_threshold > MAX_THRESHOLD) {
+        threshold = MAX_THRESHOLD;
+        } else {
+        threshold = _threshold;
+        }
+   
 	double getBirthday(int index, int dim);
 
 	void GetSimplexVertices(int index, int dim, Vertices* v);
